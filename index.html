@@ -5,48 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playlists de YouTube</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        .playlist-container iframe {
+            width: 300px; /* Tamaño más pequeño */
+            height: 170px;
+            margin: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Mis Playlists de YouTube</h1>
-        <div class="player-controls">
-            <button class="playlist-btn" data-playlist="PLhQ00Pc-dPladbOLBiytXGCjxriVgxzLy">Playlist 1</button>
-            <button class="playlist-btn" data-playlist="PLhQ00Pc-dPlYLg42amOIQy_NtZ8P_7jH8">Playlist 2</button>
-            <button class="playlist-btn" data-playlist="PLhQ00Pc-dPlaSoKRU2D6ZRqIOVpsMr6At">Playlist 3</button>
-            <button class="playlist-btn" data-playlist="PLhQ00Pc-dPlZfqVnA-HKB57BzprafP8Zv">Playlist 4</button>
-            <button id="toggle">Iniciar / Parar</button>
-            <input type="range" id="volume" min="0" max="100" value="50">
+        <div class="playlist-container" id="playlist-container">
+            <!-- Playlists generadas dinámicamente -->
         </div>
-        <iframe id="youtube-player" width="0" height="0" src="" frameborder="0" allowfullscreen style="display: none;"></iframe>
+        <button id="toggle">Iniciar / Parar</button>
+        <input type="range" id="volume" min="0" max="100" value="50">
     </div>
     <script>
-        const player = document.getElementById("youtube-player");
+        const API_KEY = "AIzaSyCVL-wLYIBCde7tH2bVIpo5VB8Rwv5WzRg"; // Tu nueva clave de API de YouTube
+        const CHANNEL_ID = "UCThorrijaGames"; // ID del canal
+        const playlistContainer = document.getElementById("playlist-container");
         let isPlaying = false;
         let volumeControl = document.getElementById("volume");
 
-        document.querySelectorAll(".playlist-btn").forEach(button => {
-            button.addEventListener("click", () => {
-                player.src = `https://www.youtube.com/embed/videoseries?list=${button.dataset.playlist}`;
-                isPlaying = true;
+        async function fetchPlaylists() {
+            const response = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=${CHANNEL_ID}&maxResults=10&key=${API_KEY}`);
+            const data = await response.json();
+            displayPlaylists(data.items);
+        }
+
+        function displayPlaylists(playlists) {
+            playlists.forEach(playlist => {
+                const iframe = document.createElement("iframe");
+                iframe.width = "300";
+                iframe.height = "170";
+                iframe.src = `https://www.youtube.com/embed/videoseries?list=${playlist.id}`;
+                iframe.frameBorder = "0";
+                iframe.allowFullscreen = true;
+                playlistContainer.appendChild(iframe);
             });
-        });
+        }
 
         document.getElementById("toggle").addEventListener("click", () => {
-            if (isPlaying) {
-                player.src = "";
-            } else {
-                const activePlaylist = document.querySelector(".playlist-btn.active");
-                if (activePlaylist) {
-                    player.src = `https://www.youtube.com/embed/videoseries?list=${activePlaylist.dataset.playlist}`;
-                }
-            }
             isPlaying = !isPlaying;
+            document.querySelectorAll(".playlist-container iframe").forEach(iframe => {
+                iframe.style.display = isPlaying ? "block" : "none";
+            });
         });
 
         volumeControl.addEventListener("input", (event) => {
             let volume = event.target.value / 100;
-            player.contentWindow.postMessage(JSON.stringify({ event: "command", func: "setVolume", args: [volume * 100] }), "*");
+            document.querySelectorAll(".playlist-container iframe").forEach(iframe => {
+                iframe.contentWindow.postMessage(JSON.stringify({ event: "command", func: "setVolume", args: [volume * 100] }), "*");
+            });
         });
+
+        fetchPlaylists();
     </script>
 </body>
 </html>
