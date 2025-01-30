@@ -4,36 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Playlists de YouTube</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-        .playlist-container iframe {
-            width: 300px; /* Tamaño más pequeño */
-            height: 170px;
-            margin: 5px;
-        }
-        .videos-container {
-            margin-top: 20px;
-        }
-        .video-item {
-            margin-bottom: 10px;
-        }
-        iframe {
-            width: 300px;
-            height: 170px;
-        }
-        #playButton {
-            margin-top: 20px;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        #playButton:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <link rel="stylesheet" href="main.css"> <!-- Vinculando el archivo main.css -->
 </head>
 <body>
     <div class="container">
@@ -48,6 +19,7 @@
 
         <button id="playButton">Reproducir Videos Automáticamente</button>
     </div>
+
     <script>
         const API_KEY = "AIzaSyCVL-wLYIBCde7tH2bVIpo5VB8Rwv5WzRg"; // Tu clave de API de YouTube
         const playlistUrls = [
@@ -123,7 +95,7 @@
                 allVideos = allVideos.concat(videos);
             }
 
-            // Elegir 30 videos aleatorios de todos
+            // Elegir 15 videos aleatorios de todos
             const selectedVideos = [];
             while (selectedVideos.length < 15 && allVideos.length > 0) {
                 const randomIndex = Math.floor(Math.random() * allVideos.length);
