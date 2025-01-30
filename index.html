@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <style>
         .playlist-container iframe {
-            width: 300px;
+            width: 300px; /* Tamaño más pequeño */
             height: 170px;
             margin: 5px;
         }
@@ -20,7 +20,6 @@
         iframe {
             width: 300px;
             height: 170px;
-            display: none; /* Inicialmente ocultos */
         }
         #playButton {
             margin-top: 20px;
@@ -124,7 +123,7 @@
                 allVideos = allVideos.concat(videos);
             }
 
-            // Elegir 15 videos aleatorios de todos
+            // Elegir 30 videos aleatorios de todos
             const selectedVideos = [];
             while (selectedVideos.length < 15 && allVideos.length > 0) {
                 const randomIndex = Math.floor(Math.random() * allVideos.length);
@@ -138,8 +137,9 @@
                 const iframe = document.createElement("iframe");
                 iframe.src = `https://www.youtube.com/embed/${videoId}`;
                 iframe.frameBorder = "0";
-                iframe.style.display = "block"; // Mostrar los iframes ahora
-                iframe.dataset.src = `https://www.youtube.com/embed/${videoId}`; // Atributo de pereza
+                iframe.width = "300";
+                iframe.height = "170";
+                iframe.allowFullscreen = true;
 
                 // Crear un contenedor para el video
                 const videoItem = document.createElement("div");
@@ -152,10 +152,27 @@
             });
         }
 
-        // Función para iniciar la reproducción
+        // Función para reproducir videos automáticamente
+        function playNextVideo() {
+            if (currentVideoIndex < videoList.length) {
+                // Mostrar el iframe correspondiente al video
+                videoList[currentVideoIndex].style.display = 'block';
+
+                // Incrementar el índice para el siguiente video
+                currentVideoIndex++;
+
+                // Si hay más videos, reproducir el siguiente después de 5 segundos
+                if (currentVideoIndex < videoList.length) {
+                    setTimeout(playNextVideo, 5000); // Espera de 5 segundos antes de cambiar al siguiente video
+                }
+            }
+        }
+
+        // Evento para iniciar la reproducción automática
         playButton.addEventListener("click", () => {
             currentVideoIndex = 0; // Iniciar desde el primer video
-            videoList.forEach(iframe => iframe.style.display = 'block'); // Mostrar todos los iframes
+            videoList.forEach(iframe => iframe.style.display = 'none'); // Ocultar todos los videos
+            playNextVideo(); // Iniciar la reproducción
         });
 
         // Cargar las playlists y videos
