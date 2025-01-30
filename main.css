@@ -1,0 +1,6 @@
+body {
+    background-image: url('https://imgs.search.brave.com/n9EsehCrAEXRQXVoYKe7wZuh8okdloGWRshR7-Lq7Jk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/Zm90b3MtZ3JhdGlz/L2NvbXB1dGFkb3It/cmV0cm8tZW0tYXJy/YW5qby1kZS1tZXNh/XzIzLTIxNTAxMTg2/MjMuanBnP3NlbXQ9/YWlzX2h5YnJpZA');
+    background-size: cover; /* Ajusta la imagen al tamaño de la pantalla */
+    background-position: center; /* Centra la imagen */
+    background-attachment: fixed; /* Hace que la imagen se quede fija al hacer scroll */
+}
