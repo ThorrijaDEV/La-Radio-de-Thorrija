@@ -10,37 +10,42 @@
     <div class="container">
         <h1>Mis Playlists de YouTube</h1>
         <div class="player-controls">
-            <button id="prev">Anterior</button>
-            <button id="stop">Parar</button>
-            <button id="next">Siguiente</button>
-            <input type="range" id="seek" min="0" max="100" value="0">
+            <button class="playlist-btn" data-playlist="PLhQ00Pc-dPladbOLBiytXGCjxriVgxzLy">Playlist 1</button>
+            <button class="playlist-btn" data-playlist="PLhQ00Pc-dPlYLg42amOIQy_NtZ8P_7jH8">Playlist 2</button>
+            <button class="playlist-btn" data-playlist="PLhQ00Pc-dPlaSoKRU2D6ZRqIOVpsMr6At">Playlist 3</button>
+            <button class="playlist-btn" data-playlist="PLhQ00Pc-dPlZfqVnA-HKB57BzprafP8Zv">Playlist 4</button>
+            <button id="toggle">Iniciar / Parar</button>
+            <input type="range" id="volume" min="0" max="100" value="50">
         </div>
-        <div class="playlist-container">
-            <iframe id="youtube-player" width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLhQ00Pc-dPladbOLBiytXGCjxriVgxzLy" frameborder="0" allowfullscreen></iframe>
-        </div>
+        <iframe id="youtube-player" width="0" height="0" src="" frameborder="0" allowfullscreen style="display: none;"></iframe>
     </div>
     <script>
-        const playlists = [
-            "PLhQ00Pc-dPladbOLBiytXGCjxriVgxzLy",
-            "PLhQ00Pc-dPlYLg42amOIQy_NtZ8P_7jH8",
-            "PLhQ00Pc-dPlaSoKRU2D6ZRqIOVpsMr6At",
-            "PLhQ00Pc-dPlZfqVnA-HKB57BzprafP8Zv"
-        ];
-        let currentPlaylist = 0;
         const player = document.getElementById("youtube-player");
-        
-        document.getElementById("prev").addEventListener("click", () => {
-            currentPlaylist = (currentPlaylist - 1 + playlists.length) % playlists.length;
-            player.src = `https://www.youtube.com/embed/videoseries?list=${playlists[currentPlaylist]}`;
+        let isPlaying = false;
+        let volumeControl = document.getElementById("volume");
+
+        document.querySelectorAll(".playlist-btn").forEach(button => {
+            button.addEventListener("click", () => {
+                player.src = `https://www.youtube.com/embed/videoseries?list=${button.dataset.playlist}`;
+                isPlaying = true;
+            });
         });
-        
-        document.getElementById("stop").addEventListener("click", () => {
-            player.src = "";
+
+        document.getElementById("toggle").addEventListener("click", () => {
+            if (isPlaying) {
+                player.src = "";
+            } else {
+                const activePlaylist = document.querySelector(".playlist-btn.active");
+                if (activePlaylist) {
+                    player.src = `https://www.youtube.com/embed/videoseries?list=${activePlaylist.dataset.playlist}`;
+                }
+            }
+            isPlaying = !isPlaying;
         });
-        
-        document.getElementById("next").addEventListener("click", () => {
-            currentPlaylist = (currentPlaylist + 1) % playlists.length;
-            player.src = `https://www.youtube.com/embed/videoseries?list=${playlists[currentPlaylist]}`;
+
+        volumeControl.addEventListener("input", (event) => {
+            let volume = event.target.value / 100;
+            player.contentWindow.postMessage(JSON.stringify({ event: "command", func: "setVolume", args: [volume * 100] }), "*");
         });
     </script>
 </body>
