@@ -11,6 +11,16 @@
             height: 170px;
             margin: 5px;
         }
+        .videos-container {
+            margin-top: 20px;
+        }
+        .video-item {
+            margin-bottom: 10px;
+        }
+        iframe {
+            width: 300px;
+            height: 170px;
+        }
     </style>
 </head>
 <body>
@@ -19,9 +29,13 @@
         <div class="playlist-container" id="playlist-container">
             <!-- Playlists generadas dinámicamente -->
         </div>
+
+        <div class="videos-container" id="videos-container">
+            <!-- Videos generados dinámicamente -->
+        </div>
     </div>
     <script>
-        // Las URLs de las playlists que has proporcionado
+        const API_KEY = "AIzaSyCVL-wLYIBCde7tH2bVIpo5VB8Rwv5WzRg"; // Tu clave de API de YouTube
         const playlistUrls = [
             "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlZXUaBzr8vBrmb_uZNW8f5K",
             "https://music.youtube.com/playlist?list=PLhQ00Pc-dPla5MU2PnVrV8P6mNPJ-fZXZ",
@@ -40,6 +54,12 @@
         ];
 
         const playlistContainer = document.getElementById("playlist-container");
+        const videosContainer = document.getElementById("videos-container");
+
+        // Función para obtener el ID de la lista de reproducción
+        function getPlaylistId(url) {
+            return new URL(url).searchParams.get('list');
+        }
 
         // Función para mostrar las playlists
         function displayPlaylists() {
@@ -47,15 +67,75 @@
                 const iframe = document.createElement("iframe");
                 iframe.width = "300";
                 iframe.height = "170";
-                iframe.src = `https://www.youtube.com/embed?listType=playlist&list=${new URL(url).searchParams.get('list')}`;
+                iframe.src = `https://www.youtube.com/embed?listType=playlist&list=${getPlaylistId(url)}`;
                 iframe.frameBorder = "0";
                 iframe.allowFullscreen = true;
                 playlistContainer.appendChild(iframe);
             });
         }
 
-        // Cargar las playlists al cargar la página
+        // Función para obtener los videos de una playlist
+        async function fetchVideos(playlistId) {
+            try {
+                const response = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${API_KEY}`);
+                const data = await response.json();
+                if (data.items) {
+                    return data.items;
+                } else {
+                    console.error("No se encontraron videos en esta playlist.");
+                    return [];
+                }
+            } catch (error) {
+                console.error("Error obteniendo videos:", error);
+                return [];
+            }
+        }
+
+        // Función para mostrar los videos
+        async function displayVideos() {
+            // Limpiar el contenedor de videos antes de agregar nuevos
+            videosContainer.innerHTML = "";
+
+            let allVideos = [];
+
+            // Obtener los videos de todas las playlists
+            for (let url of playlistUrls) {
+                const playlistId = getPlaylistId(url);
+                const videos = await fetchVideos(playlistId);
+                allVideos = allVideos.concat(videos);
+            }
+
+            // Elegir 30 videos aleatorios de todos
+            const selectedVideos = [];
+            while (selectedVideos.length < 30 && allVideos.length > 0) {
+                const randomIndex = Math.floor(Math.random() * allVideos.length);
+                selectedVideos.push(allVideos[randomIndex]);
+                allVideos.splice(randomIndex, 1);  // Eliminar el video elegido
+            }
+
+            // Crear un iframe para cada video seleccionado y mostrarlo
+            selectedVideos.forEach(video => {
+                const videoId = video.snippet.resourceId.videoId;
+                const iframe = document.createElement("iframe");
+                iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                iframe.frameBorder = "0";
+                iframe.width = "300";
+                iframe.height = "170";
+                iframe.allowFullscreen = true;
+
+                // Crear un contenedor para el video
+                const videoItem = document.createElement("div");
+                videoItem.classList.add("video-item");
+                videoItem.appendChild(iframe);
+
+                // Agregar el video a la página
+                videosContainer.appendChild(videoItem);
+            });
+        }
+
+        // Cargar las playlists y videos
         displayPlaylists();
+        displayVideos();
     </script>
 </body>
 </html>
