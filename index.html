@@ -19,83 +19,43 @@
         <div class="playlist-container" id="playlist-container">
             <!-- Playlists generadas dinámicamente -->
         </div>
-        <button id="toggle">Iniciar / Parar</button>
-        <input type="range" id="volume" min="0" max="100" value="50">
     </div>
     <script>
-        const API_KEY = "AIzaSyCVL-wLYIBCde7tH2bVIpo5VB8Rwv5WzRg"; // Tu clave de API de YouTube
-        const CHANNEL_USERNAME = "@ThorrijaGames"; // Nombre del canal
+        // Las URLs de las playlists que has proporcionado
+        const playlistUrls = [
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlZXUaBzr8vBrmb_uZNW8f5K",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPla5MU2PnVrV8P6mNPJ-fZXZ",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPladbOLBiytXGCjxriVgxzLy",
+            "https://music.youtube.com/playlist?list=LRYRPCXYFlt6YFhEOOpVht-PY7dCZc2VM7J6K",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlYLg42amOIQy_NtZ8P_7jH8",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlY0b8D9ae0zo_WxpZkHIKIH",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlZfqVnA-HKB57BzprafP8Zv",
+            "https://music.youtube.com/playlist?list=PLdtKlM9bMviRJeQqcjuqe5DO8ocqw5vBe",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlasPBLyfqc0XWTZEhWObzPo",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlaAOAzTsmkn6p0NNt0oloFn",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlaSoKRU2D6ZRqIOVpsMr6At",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlb2Q_UdTYkkL6YiEi3TaDau",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlYkx_L1_yX-1FborJcaGav7",
+            "https://music.youtube.com/playlist?list=PLhQ00Pc-dPlYtuDxOTm_0-5Mcrz_ULOiI"
+        ];
+
         const playlistContainer = document.getElementById("playlist-container");
-        let isPlaying = false;
-        let volumeControl = document.getElementById("volume");
-
-        // Función para obtener el channelId del canal usando la búsqueda
-        async function getChannelId() {
-            try {
-                const response = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${CHANNEL_USERNAME}&type=channel&key=${API_KEY}`);
-                const data = await response.json();
-                if (data.items && data.items.length > 0) {
-                    return data.items[0].id.channelId;
-                } else {
-                    console.error("No se encontró el canal.");
-                    return null;
-                }
-            } catch (error) {
-                console.error("Error obteniendo la ID del canal:", error);
-                return null;
-            }
-        }
-
-        // Función para obtener las playlists del canal
-        async function fetchPlaylists() {
-            const CHANNEL_ID = await getChannelId();
-            if (!CHANNEL_ID) return;
-            
-            try {
-                // Solicitar el máximo de 100 playlists por respuesta
-                const response = await fetch(`https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=${CHANNEL_ID}&maxResults=100&key=${API_KEY}`);
-                const data = await response.json();
-                if (data.items) {
-                    displayPlaylists(data.items);
-                } else {
-                    console.error("No se encontraron playlists.", data);
-                }
-            } catch (error) {
-                console.error("Error obteniendo playlists:", error);
-            }
-        }
 
         // Función para mostrar las playlists
-        function displayPlaylists(playlists) {
-            playlists.forEach(playlist => {
+        function displayPlaylists() {
+            playlistUrls.forEach(url => {
                 const iframe = document.createElement("iframe");
                 iframe.width = "300";
                 iframe.height = "170";
-                iframe.src = `https://www.youtube.com/embed/videoseries?list=${playlist.id}`;
+                iframe.src = `https://www.youtube.com/embed?listType=playlist&list=${new URL(url).searchParams.get('list')}`;
                 iframe.frameBorder = "0";
                 iframe.allowFullscreen = true;
                 playlistContainer.appendChild(iframe);
             });
         }
 
-        // Función para controlar la reproducción (mostrar/ocultar)
-        document.getElementById("toggle").addEventListener("click", () => {
-            isPlaying = !isPlaying;
-            document.querySelectorAll(".playlist-container iframe").forEach(iframe => {
-                iframe.style.display = isPlaying ? "block" : "none";
-            });
-        });
-
-        // Función para controlar el volumen
-        volumeControl.addEventListener("input", (event) => {
-            let volume = event.target.value / 100;
-            document.querySelectorAll(".playlist-container iframe").forEach(iframe => {
-                iframe.contentWindow.postMessage(JSON.stringify({ event: "command", func: "setVolume", args: [volume * 100] }), "*");
-            });
-        });
-
         // Cargar las playlists al cargar la página
-        fetchPlaylists();
+        displayPlaylists();
     </script>
 </body>
 </html>
