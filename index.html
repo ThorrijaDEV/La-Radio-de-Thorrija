@@ -9,12 +9,39 @@
 <body>
     <div class="container">
         <h1>Mis Playlists de YouTube</h1>
+        <div class="player-controls">
+            <button id="prev">Anterior</button>
+            <button id="stop">Parar</button>
+            <button id="next">Siguiente</button>
+            <input type="range" id="seek" min="0" max="100" value="0">
+        </div>
         <div class="playlist-container">
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLhQ00Pc-dPladbOLBiytXGCjxriVgxzLy" frameborder="0" allowfullscreen></iframe>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLhQ00Pc-dPlYLg42amOIQy_NtZ8P_7jH8" frameborder="0" allowfullscreen></iframe>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLhQ00Pc-dPlaSoKRU2D6ZRqIOVpsMr6At" frameborder="0" allowfullscreen></iframe>
-            <iframe width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLhQ00Pc-dPlZfqVnA-HKB57BzprafP8Zv" frameborder="0" allowfullscreen></iframe>
+            <iframe id="youtube-player" width="560" height="315" src="https://www.youtube.com/embed/videoseries?list=PLhQ00Pc-dPladbOLBiytXGCjxriVgxzLy" frameborder="0" allowfullscreen></iframe>
         </div>
     </div>
+    <script>
+        const playlists = [
+            "PLhQ00Pc-dPladbOLBiytXGCjxriVgxzLy",
+            "PLhQ00Pc-dPlYLg42amOIQy_NtZ8P_7jH8",
+            "PLhQ00Pc-dPlaSoKRU2D6ZRqIOVpsMr6At",
+            "PLhQ00Pc-dPlZfqVnA-HKB57BzprafP8Zv"
+        ];
+        let currentPlaylist = 0;
+        const player = document.getElementById("youtube-player");
+        
+        document.getElementById("prev").addEventListener("click", () => {
+            currentPlaylist = (currentPlaylist - 1 + playlists.length) % playlists.length;
+            player.src = `https://www.youtube.com/embed/videoseries?list=${playlists[currentPlaylist]}`;
+        });
+        
+        document.getElementById("stop").addEventListener("click", () => {
+            player.src = "";
+        });
+        
+        document.getElementById("next").addEventListener("click", () => {
+            currentPlaylist = (currentPlaylist + 1) % playlists.length;
+            player.src = `https://www.youtube.com/embed/videoseries?list=${playlists[currentPlaylist]}`;
+        });
+    </script>
 </body>
 </html>
