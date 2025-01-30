@@ -21,6 +21,18 @@
             width: 300px;
             height: 170px;
         }
+        #playButton {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #playButton:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
@@ -33,6 +45,8 @@
         <div class="videos-container" id="videos-container">
             <!-- Videos generados dinámicamente -->
         </div>
+
+        <button id="playButton">Reproducir Videos Automáticamente</button>
     </div>
     <script>
         const API_KEY = "AIzaSyCVL-wLYIBCde7tH2bVIpo5VB8Rwv5WzRg"; // Tu clave de API de YouTube
@@ -55,6 +69,10 @@
 
         const playlistContainer = document.getElementById("playlist-container");
         const videosContainer = document.getElementById("videos-container");
+        const playButton = document.getElementById("playButton");
+
+        let videoList = [];
+        let currentVideoIndex = 0;
 
         // Función para obtener el ID de la lista de reproducción
         function getPlaylistId(url) {
@@ -130,8 +148,32 @@
 
                 // Agregar el video a la página
                 videosContainer.appendChild(videoItem);
+                videoList.push(iframe); // Agregar iframe a la lista de videos
             });
         }
+
+        // Función para reproducir videos automáticamente
+        function playNextVideo() {
+            if (currentVideoIndex < videoList.length) {
+                // Mostrar el iframe correspondiente al video
+                videoList[currentVideoIndex].style.display = 'block';
+
+                // Incrementar el índice para el siguiente video
+                currentVideoIndex++;
+
+                // Si hay más videos, reproducir el siguiente después de 5 segundos
+                if (currentVideoIndex < videoList.length) {
+                    setTimeout(playNextVideo, 5000); // Espera de 5 segundos antes de cambiar al siguiente video
+                }
+            }
+        }
+
+        // Evento para iniciar la reproducción automática
+        playButton.addEventListener("click", () => {
+            currentVideoIndex = 0; // Iniciar desde el primer video
+            videoList.forEach(iframe => iframe.style.display = 'none'); // Ocultar todos los videos
+            playNextVideo(); // Iniciar la reproducción
+        });
 
         // Cargar las playlists y videos
         displayPlaylists();
