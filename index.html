@@ -124,9 +124,9 @@
                 allVideos = allVideos.concat(videos);
             }
 
-            // Elegir 30 videos aleatorios de todos
+            // Elegir 15 videos aleatorios de todos
             const selectedVideos = [];
-            while (selectedVideos.length < 30 && allVideos.length > 0) {
+            while (selectedVideos.length < 15 && allVideos.length > 0) {
                 const randomIndex = Math.floor(Math.random() * allVideos.length);
                 selectedVideos.push(allVideos[randomIndex]);
                 allVideos.splice(randomIndex, 1);  // Eliminar el video elegido
@@ -138,9 +138,8 @@
                 const iframe = document.createElement("iframe");
                 iframe.src = `https://www.youtube.com/embed/${videoId}`;
                 iframe.frameBorder = "0";
+                iframe.style.display = "block"; // Mostrar los iframes ahora
                 iframe.dataset.src = `https://www.youtube.com/embed/${videoId}`; // Atributo de pereza
-                iframe.setAttribute('data-loaded', 'false'); // Marca para cargar solo cuando sea necesario
-                iframe.classList.add("lazy-load"); // Clases para Lazy Load
 
                 // Crear un contenedor para el video
                 const videoItem = document.createElement("div");
@@ -153,36 +152,10 @@
             });
         }
 
-        // Cargar los videos solo cuando el iframe esté cerca de la pantalla
-        function lazyLoadVideos() {
-            const lazyVideos = document.querySelectorAll("iframe.lazy-load");
-
-            const options = {
-                rootMargin: "0px 0px 100px 0px", // Cargar el video cuando esté cerca del viewport
-                threshold: 0
-            };
-
-            const observer = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const iframe = entry.target;
-                        if (iframe.dataset.src && iframe.getAttribute('data-loaded') === 'false') {
-                            iframe.src = iframe.dataset.src;
-                            iframe.setAttribute('data-loaded', 'true'); // Marcar como cargado
-                        }
-                        observer.unobserve(iframe); // Dejar de observar una vez cargado
-                    }
-                });
-            }, options);
-
-            lazyVideos.forEach(iframe => observer.observe(iframe));
-        }
-
         // Función para iniciar la reproducción
         playButton.addEventListener("click", () => {
             currentVideoIndex = 0; // Iniciar desde el primer video
             videoList.forEach(iframe => iframe.style.display = 'block'); // Mostrar todos los iframes
-            lazyLoadVideos(); // Iniciar la carga perezosa
         });
 
         // Cargar las playlists y videos
